@@ -1,4 +1,5 @@
 #include "bitboard.hpp"
+#pragma once
 
 static const int columnOrder[7] = {3, 4, 2, 5, 1, 6, 0}; // order of columns to check
 
@@ -62,7 +63,7 @@ class Solver {
             return alpha;
         }
 
-        bool isDraw(const BitBoard& board) { 
+        bool isDraw(const BitBoard& board) const { 
             return board.getMoves() == 42;
         }
 

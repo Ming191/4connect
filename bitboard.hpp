@@ -1,5 +1,5 @@
 #include <cstdint>
-
+#pragma once
 /*
 	 * .  .  .  .  .  .  .
 	 * 5 12 19 26 33 40 47
