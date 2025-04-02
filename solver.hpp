@@ -7,8 +7,9 @@ class Solver {
     private:
         unsigned long long nodeCount; 
         int maxDepth;
+        int startDepth;
     public:
-        Solver(int depth = 12) : nodeCount(0), maxDepth(depth) {} // Constructor to initialize nodeCount to 0
+        Solver(int depth = 8) : nodeCount(0), maxDepth(depth), startDepth(0) {} // Constructor to initialize nodeCount to 0
 
         unsigned long long getNodeCount() const {
             return nodeCount;
@@ -16,6 +17,22 @@ class Solver {
 
         void incrementNodeCount() {
             ++nodeCount;
+        }
+
+        void setMaxDepth(int depth) {
+            maxDepth = depth;
+        }
+
+        int getMaxDepth() const {
+            return maxDepth;
+        }
+
+        void setStartDepth(int depth) {
+            startDepth = depth;
+        }
+
+        int getStartDepth() const {
+            return startDepth;
         }
 
         bool canWinNextMove(const BitBoard& board) {
@@ -82,7 +99,7 @@ class Solver {
                         return col;
                     }
                     
-                    int score = -negamax(newBoard, 0, -21, 21);
+                    int score = -negamax(newBoard, startDepth, -21, 21);
                     
                     if (score > bestScore) {
                         bestScore = score;

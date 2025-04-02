@@ -30,6 +30,14 @@ public:
         }
     }
     
+    void setAIDepth(int depth) {
+        solver.setMaxDepth(depth);
+    }
+    
+    int getAIDepth() const {
+        return solver.getMaxDepth();
+    }
+    
     void printBoard() const {
         std::cout << "\n";
         for (int row = BitBoard::HEIGHT - 1; row >= 0; row--) {
@@ -89,6 +97,29 @@ int main() {
     std::cout << "Welcome to Connect Four!\n";
     std::cout << "You are X, the AI is O.\n\n";
     
+    // Ask for AI difficulty (depth)
+    std::cout << "Choose AI depth:\n";
+    std::cout << "Enter your choice: ";
+    
+    int depthChoice;
+    int aiDepth = 8; // Default
+    
+    bool validDepthChoice = false;
+    while (!validDepthChoice) {
+        std::cin >> depthChoice;
+        
+        if (std::cin.fail() || depthChoice < 1 || depthChoice > 41) {
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            std::cout << "Invalid choice. Please enter a number between 1 and 41: ";
+            continue;
+        }
+        
+        validDepthChoice = true;
+    }
+
+    aiDepth = depthChoice;
+
     // Ask if player wants to go first or second
     std::cout << "Do you want to go first or second?\n";
     std::cout << "1: First (You start)\n";
@@ -114,7 +145,9 @@ int main() {
     
     humanGoesFirst = (choice == 1);
     
-    ConnectFourGame game(humanGoesFirst);
+    ConnectFourGame game(humanGoesFirst, aiDepth);
+    std::cout << "\nAI difficulty set to depth: " << game.getAIDepth() << std::endl;
+    
     bool gameOver = false;
     
     std::cout << "\nEnter a column number (0-6) to drop your piece.\n\n";
