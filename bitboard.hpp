@@ -9,6 +9,10 @@
 	 * 1  8 15 22 29 36 43
 	 * 0  7 14 21 28 35 42 
 */
+static const int WIDTH = 7;
+static const int HEIGHT = 6;
+static const int MIN_SCORE = -(WIDTH * HEIGHT) / 2 + 3;
+static const int MAX_SCORE = (WIDTH * HEIGHT) / 2 - 3;
 
 class BitBoard 
 {
@@ -57,9 +61,6 @@ class BitBoard
         }
 
     public:
-        static constexpr int WIDTH = 7;
-        static constexpr int HEIGHT = 6;
-
         BitBoard(): current_player(0), mask(0), moves(0) {}
 
         bool isColumnEmpty(int col) const
@@ -75,6 +76,17 @@ class BitBoard
                 mask |= mask + bottomMask(col);
                 moves++;
             }
+        }
+
+        unsigned int play(const std::string &seq) 
+        {
+            for (unsigned int i = 0; i < seq.size(); i++) 
+            {
+                int col = seq[i] - '1';
+                if (col < 0 || col >= WIDTH || !isColumnEmpty(col)) return i; // invalid move
+                play(col);
+            }
+            return seq.size();
         }
 
         static bool checkGeneric(uint64_t pos) 

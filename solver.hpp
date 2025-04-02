@@ -1,113 +1,87 @@
 #include "bitboard.hpp"
+#include "lookupTable.hpp"
 #pragma once
-
-static const int columnOrder[7] = {3, 4, 2, 5, 1, 6, 0}; // order of columns to check
 
 class Solver {
     private:
         unsigned long long nodeCount; 
-        int maxDepth;
-        int startDepth;
+        int columnOrder[WIDTH]; // Order of columns to check
+        LookupTable table; // Lookup table for memoization
     public:
-        Solver(int depth = 8) : nodeCount(0), maxDepth(depth), startDepth(0) {} // Constructor to initialize nodeCount to 0
+        Solver() : nodeCount(0), table(8388593){
+            for (int i = 0; i < WIDTH; i++)
+            columnOrder[i] = WIDTH/2 + (1-2*(i%2))*(i+1)/2; 
+        }
 
         unsigned long long getNodeCount() const {
             return nodeCount;
         }
 
-        void incrementNodeCount() {
-            ++nodeCount;
-        }
+        int negamax(const BitBoard& board, int alpha, int beta) {
+            nodeCount++;
+            if (board.getMoves() == WIDTH * HEIGHT) {
+                return 0; // Draw
+            }
 
-        void setMaxDepth(int depth) {
-            maxDepth = depth;
-        }
-
-        int getMaxDepth() const {
-            return maxDepth;
-        }
-
-        void setStartDepth(int depth) {
-            startDepth = depth;
-        }
-
-        int getStartDepth() const {
-            return startDepth;
-        }
-
-        bool canWinNextMove(const BitBoard& board) {
-            for (int i = 0; i < 7; ++i) {
-                int col = columnOrder[i];
-                if (board.isColumnEmpty(col) && board.isWin(col)) {
-                    return true;
+            for (int i = 0; i < WIDTH; i++) {
+                if (board.isColumnEmpty(i) && board.isWin(i)) {
+                    return (WIDTH * HEIGHT+1 - board.getMoves())/2; // Win for the current player
                 }
             }
-            return false;
-        }
 
-        int negamax (const BitBoard& board, int depth, int alpha, int beta) {
-            incrementNodeCount();
-            if(isDraw(board) || depth > maxDepth) {
-                return 0;
+            int max = (WIDTH * HEIGHT - 1 - board.getMoves()) / 2; // Upper bound
+            if(int score = table.get(board.key())) {
+                max = score + MIN_SCORE - 1;
             }
-
-            if (canWinNextMove(board)) {
-                return BitBoard::WIDTH * BitBoard::HEIGHT + 1 - board.getMoves()/2;
-            }
-
-            int bestValue = BitBoard::WIDTH * BitBoard::HEIGHT - 1 - board.getMoves()/2;
-            
-            if (beta > bestValue) {
-                beta = bestValue;
+            if (beta > max) {
+                beta = max;
                 if (alpha >= beta) {
-                    return beta;
+                    return beta; // Beta cut-off
                 }
             }
 
-            for (int i = 0; i < 7; ++i) {
+            for (int i = 0; i < WIDTH; ++i) {
                 if (board.isColumnEmpty(columnOrder[i])) {
-                    BitBoard newBoard = board;
+                    BitBoard newBoard(board);
                     newBoard.play(columnOrder[i]);
-                    int value = -negamax(newBoard, depth + 1, -beta, -alpha);
-                    if (value >= beta) {
-                        return value;
+
+                    int score = -negamax(newBoard, -beta, -alpha);
+                    if (score >= beta) {
+                        return score; // Beta cut-off
                     }
-                    if (value > alpha) {
-                        alpha = value;
+                    if (score > alpha) {
+                        alpha = score;
                     }
                 }
             }
-            return alpha;
+            table.insert(board.key(), alpha - MIN_SCORE + 1); // Store the score in the lookup table
+            return alpha; // Return the best score found  
         }
+        
+    int solve (const BitBoard &board) {
+        nodeCount = 0;
+        table.reset();
+        return negamax(board, -WIDTH*HEIGHT/2, WIDTH*HEIGHT/2);
+    }
 
-        bool isDraw(const BitBoard& board) const { 
-            return board.getMoves() == 42;
-        }
-
-        int findBestMove(const BitBoard& board) {
-            int bestScore = INT32_MIN;
-            int bestMove = -1;
-            
-            for (int i = 0; i < BitBoard::WIDTH; i++) {
-                int col = columnOrder[i];
-                if (board.isColumnEmpty(col)) {
-                    BitBoard newBoard = board;
-                    newBoard.play(col);
-                    
-                    // Check for immediate win
-                    if (board.isWin(col)) {
-                        return col;
-                    }
-                    
-                    int score = -negamax(newBoard, startDepth, -21, 21);
-                    
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMove = col;
-                    }
+    unsigned int findBestMove(const BitBoard &board) {
+        int bestMove = -1;
+        int bestScore = -WIDTH*HEIGHT/2;
+        for (int i = 0; i < WIDTH; ++i) {
+            int col = columnOrder[i];
+            if (board.isColumnEmpty(col)) {
+                BitBoard newBoard(board);
+                newBoard.play(col);
+                if(newBoard.isWin(col)) {
+                    return col; // Immediate win
+                }
+                int score = -negamax(newBoard, -WIDTH*HEIGHT/2, WIDTH*HEIGHT/2);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = col;
                 }
             }
-            
-            return bestMove;
         }
+        return bestMove;
+    }
 };
