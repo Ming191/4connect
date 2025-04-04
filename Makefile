@@ -1,20 +1,18 @@
-# Makefile for Connect Four
+CXX=g++
+CXXFLAGS=--std=c++20 -W -Wall -O3
 
-CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra -O2
-TARGET = connect4
-SRCS = main.cpp
-HEADERS = bitboard.hpp solver.hpp
+SRCS=main.cpp
+OBJS=$(subst .cpp,.o,$(SRCS))
 
-all: $(TARGET)
+c4solver:$(OBJS)
+	$(CXX) $(LDFLAGS) -o c4solver $(OBJS) $(LOADLIBES) $(LDLIBS)
 
-$(TARGET): $(SRCS) $(HEADERS)
-	$(CXX) $(CXXFLAGS) $(SRCS) -o $(TARGET)
+.depend: $(SRCS)
+	$(CXX) $(CXXFLAGS) -MM $^ > ./.depend
+	
+include .depend
 
 clean:
-	rm -f $(TARGET)
+	rm -f *.o .depend c4solver
 
-run: $(TARGET)
-	./$(TARGET)
 
-.PHONY: all clean run
