@@ -1,0 +1,104 @@
+Processing Line 1: 444142
+. . . . . . . 
+. . . . . . . 
+. . . X . . . 
+. . . X . . . 
+. . . O . . . 
+O O . X . . . 
+---------------
+1 2 3 4 5 6 7 
+Score: 4
+Nodes visited: 64799263
+Time taken: 177389 ms
+
+Processing Line 2: 44414232
+. . . . . . . 
+. . . . . . . 
+. . . X . . . 
+. . . X . . . 
+. O . O . . . 
+O O X X . . . 
+---------------
+1 2 3 4 5 6 7 
+Score: 4
+Nodes visited: 612422834
+Time taken: 5042 ms
+
+Processing Line 3: 444142322
+. . . . . . . 
+. . . . . . . 
+. . . O . . . 
+. O . O . . . 
+. X . X . . . 
+X X O O . . . 
+---------------
+1 2 3 4 5 6 7 
+Score: -3
+Nodes visited: 190479743
+Time taken: 1423 ms
+
+Processing Line 4: 44414232231
+. . . . . . . 
+. . . . . . . 
+. . . O . . . 
+. O . O . . . 
+O X X X . . . 
+X X O O . . . 
+---------------
+1 2 3 4 5 6 7 
+Score: -3
+Nodes visited: 46667285
+Time taken: 345 ms
+
+Processing Line 5: 444142322311
+. . . . . . . 
+. . . . . . . 
+. . . X . . . 
+O X . X . . . 
+X O O O . . . 
+O O X X . . . 
+---------------
+1 2 3 4 5 6 7 
+Score: 3
+Nodes visited: 14937220
+Time taken: 127 ms
+
+Processing Line 6: 4441423223112
+. . . . . . . 
+. . . . . . . 
+. O . O . . . 
+X O . O . . . 
+O X X X . . . 
+X X O O . . . 
+---------------
+1 2 3 4 5 6 7 
+Score: 0
+Nodes visited: 23079474
+Time taken: 164 ms
+
+Processing Line 7: 44414232231127
+. . . . . . . 
+. . . . . . . 
+. X . X . . . 
+O X . X . . . 
+X O O O . . . 
+O O X X . . O 
+---------------
+1 2 3 4 5 6 7 
+Score: 6
+Nodes visited: 432840
+Time taken: 3 ms
+
+Processing Line 8: 4441423223112722
+. O . . . . . 
+. X . . . . . 
+. X . X . . . 
+O X . X . . . 
+X O O O . . . 
+O O X X . . O 
+---------------
+1 2 3 4 5 6 7 
+Score: 6
+Nodes visited: 24339
+Time taken: 0 ms
+
