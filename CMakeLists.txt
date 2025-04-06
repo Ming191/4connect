@@ -11,4 +11,5 @@ add_executable(4connect
         main.cpp
         bitboard.h
         solver.h
+        lookup_table.h
 )

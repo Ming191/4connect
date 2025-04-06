@@ -74,6 +74,10 @@ public:
         std::cout << "1 2 3 4 5 6 7 \n"; // Column numbers
     }
 
+    ull getHash() const {
+        return board + mask;
+    }
+
 private:
     ull board;
     ull mask;
