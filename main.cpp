@@ -10,8 +10,8 @@ int main() {
     Solver solver;
     std::string line;
 
-    std::ifstream file(R"(C:\Users\min\CLionProjects\4connect\test.txt)");
-    std::ofstream report(R"(C:\Users\min\CLionProjects\4connect\report_version_1_0_1.txt)");
+    std::ifstream file("test.txt");
+    std::ofstream report("reports/report_version_1_0_1.txt");
 
     if (!file) {
         std::cerr << "Error: Unable to open 'test.txt'.\n";

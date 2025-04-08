@@ -1,0 +1,1 @@
+main.o: main.cpp bitboard.h solver.h lookup_table.h

@@ -8,8 +8,8 @@ O O . X . . .
 ---------------
 1 2 3 4 5 6 7 
 Score: 4
-Nodes visited: 64799263
-Time taken: 177389 ms
+Nodes visited: 323168587
+Time taken: 12161 ms
 
 Processing Line 2: 44414232
 . . . . . . . 
@@ -21,8 +21,8 @@ O O X X . . .
 ---------------
 1 2 3 4 5 6 7 
 Score: 4
-Nodes visited: 612422834
-Time taken: 5042 ms
+Nodes visited: 17446517
+Time taken: 760 ms
 
 Processing Line 3: 444142322
 . . . . . . . 
@@ -34,8 +34,8 @@ X X O O . . .
 ---------------
 1 2 3 4 5 6 7 
 Score: -3
-Nodes visited: 190479743
-Time taken: 1423 ms
+Nodes visited: 5200573
+Time taken: 224 ms
 
 Processing Line 4: 44414232231
 . . . . . . . 
@@ -47,8 +47,8 @@ X X O O . . .
 ---------------
 1 2 3 4 5 6 7 
 Score: -3
-Nodes visited: 46667285
-Time taken: 345 ms
+Nodes visited: 1663819
+Time taken: 90 ms
 
 Processing Line 5: 444142322311
 . . . . . . . 
@@ -60,8 +60,8 @@ O O X X . . .
 ---------------
 1 2 3 4 5 6 7 
 Score: 3
-Nodes visited: 14937220
-Time taken: 127 ms
+Nodes visited: 813672
+Time taken: 52 ms
 
 Processing Line 6: 4441423223112
 . . . . . . . 
@@ -73,8 +73,8 @@ X X O O . . .
 ---------------
 1 2 3 4 5 6 7 
 Score: 0
-Nodes visited: 23079474
-Time taken: 164 ms
+Nodes visited: 670881
+Time taken: 45 ms
 
 Processing Line 7: 44414232231127
 . . . . . . . 
@@ -86,8 +86,8 @@ O O X X . . O
 ---------------
 1 2 3 4 5 6 7 
 Score: 6
-Nodes visited: 432840
-Time taken: 3 ms
+Nodes visited: 82613
+Time taken: 17 ms
 
 Processing Line 8: 4441423223112722
 . O . . . . . 
@@ -99,6 +99,6 @@ O O X X . . O
 ---------------
 1 2 3 4 5 6 7 
 Score: 6
-Nodes visited: 24339
-Time taken: 0 ms
+Nodes visited: 11451
+Time taken: 13 ms
 
