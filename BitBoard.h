@@ -172,24 +172,6 @@ public:
         return seq.size();
     }
 
-    void show() const {
-        for (int row = HEIGHT - 1; row >= 0; row--) {
-            for (int col = 0; col < WIDTH; col++) {
-                ull pos = 1ULL << (row + col * WIDTH);
-                if (player_mask & pos) {
-                    std::cout << "X ";  // Player 1
-                } else if (board_mask & pos) {
-                    std::cout << "O ";  // Player 2
-                } else {
-                    std::cout << ". ";  // Empty space
-                }
-            }
-            std::cout << "\n";
-        }
-        std::cout << "---------------\n";
-        std::cout << "1 2 3 4 5 6 7 \n"; // Column numbers
-    }
-
     ull getHash() const {
         return player_mask + board_mask;
     }

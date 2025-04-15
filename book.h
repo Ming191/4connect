@@ -10,6 +10,7 @@ const std::string DATABASE_PATH = "opening_database.bin";
 const std::string TEMP_FILE_PATH = "temp_positions.bin";
 constexpr size_t DATABASE_DEPTH = 12;
 constexpr size_t DATABASE_NUM_POSITIONS = 4200899;
+constexpr static int NOT_FOUND = -99;
 
 inline uint32_t read_u32_be(std::istream& in) {
     uint8_t bytes[4];
@@ -25,11 +26,6 @@ inline int8_t read_i8(std::istream& in) {
     char byte;
     in.read(&byte, 1);
     return static_cast<int8_t>(byte);
-}
-
-inline void write_i8(std::ostream& out, int8_t value) {
-    char byte = static_cast<char>(value);
-    out.write(&byte, 1);
 }
 
 class OpeningDatabaseStorage {
@@ -53,7 +49,7 @@ public:
         return storage;
     }
 
-    [[nodiscard]] std::optional<int> get(uint32_t position_code) const {
+    std::optional<int> get(uint32_t position_code) const {
         size_t step = DATABASE_NUM_POSITIONS - 1;
         size_t pos = step;
         int value = -99;
@@ -61,7 +57,7 @@ public:
         while (step > 0) {
             step = (step != 1) ? ((step + (step & 1)) >> 1) : 0;
 
-            uint32_t code = pos < positions.size() ? positions[pos] : 0;
+            const uint32_t code = pos < positions.size() ? positions[pos] : 0;
 
             if (position_code < code) {
                 pos = pos >= step ? pos - step : 0;
@@ -73,7 +69,7 @@ public:
             }
         }
 
-        return value != -99 ? std::optional<int>(value) : std::nullopt;
+        return value != NOT_FOUND ? std::optional<int>(value) : std::nullopt;
     }
 };
 
@@ -88,7 +84,7 @@ public:
         return OpeningDatabase(OpeningDatabaseStorage::load());
     }
 
-    [[nodiscard]] std::optional<int> get(const uint32_t position_code) const {
+    std::optional<int> get(const uint32_t position_code) const {
         return storage->get(position_code);
     }
 };
