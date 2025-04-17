@@ -7,7 +7,6 @@
 #include <algorithm>
 
 const std::string DATABASE_PATH = "opening_database.bin";
-const std::string TEMP_FILE_PATH = "temp_positions.bin";
 constexpr size_t DATABASE_DEPTH = 12;
 constexpr size_t DATABASE_NUM_POSITIONS = 4200899;
 constexpr static int NOT_FOUND = -99;

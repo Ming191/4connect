@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add the executable
-add_executable(connect4 main.cpp)
+add_executable(connect4 main.cpp
+        BitBoard.h
+        lookup_table.h)
 
 # Include directories
 target_include_directories(connect4 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

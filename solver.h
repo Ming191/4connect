@@ -1,5 +1,3 @@
-// Solver for Connect 4 - rewritten in C++ to mirror Pascal Pons' Rust implementation
-
 #ifndef SOLVER_H
 #define SOLVER_H
 
@@ -9,7 +7,6 @@
 #include <array>
 #include <optional>
 #include <utility>
-#include <vector>
 #include <iostream>
 #include <algorithm>
 #include <cassert>
@@ -17,11 +14,11 @@
 
 class Solver {
 public:
-    Solver(const BitBoard &board)
-        : board(board), node_count(0), transposition_table(), opening_database(std::nullopt) {}
+    explicit Solver(const BitBoard &board)
+        : board(board), node_count(0), table(), opening_database(std::nullopt) {}
 
     Solver(const BitBoard &board, LookupTable tt)
-        : board(board), node_count(0), transposition_table(std::move(tt)), opening_database(std::nullopt) {}
+        : board(board), node_count(0), table(std::move(tt)), opening_database(std::nullopt) {}
 
     Solver& with_opening_database(const OpeningDatabase& db) {
         opening_database = db;
@@ -39,17 +36,17 @@ public:
     int score_to_win_distance(int score) const {
         if (score == 0) {
             return WIDTH * HEIGHT - board.getMoves();
-        } else if (score > 0) {
-            return (WIDTH * HEIGHT / 2 + 1 - score) - board.getMoves() / 2;
-        } else {
-            return (WIDTH * HEIGHT / 2 + 1 + score) - board.getMoves() / 2;
         }
+        if (score > 0) {
+            return (WIDTH * HEIGHT / 2 + 1 - score) - board.getMoves() / 2;
+        }
+        return (WIDTH * HEIGHT / 2 + 1 + score) - board.getMoves() / 2;
     }
 
 private:
     BitBoard board;
     size_t node_count;
-    LookupTable transposition_table;
+    LookupTable table;
     std::optional<OpeningDatabase> opening_database;
 
     struct MoveSorter {
@@ -92,7 +89,7 @@ private:
             }
         }
 
-        uint64_t non_losing = board.nonLosingMoves();
+        const uint64_t non_losing = board.nonLosingMoves();
         if (non_losing == 0) {
             return -(WIDTH * HEIGHT - board.getMoves()) / 2;
         }
@@ -106,11 +103,11 @@ private:
 
         int max = (WIDTH * HEIGHT - 1 - board.getMoves()) / 2;
 
-        uint64_t key = board.getHash();
-        int val = transposition_table.get(key);
+        const uint64_t key = board.getHash();
+        const int val = table.get(key);
         if (val != 0) {
             if (val > MAX_SCORE - MIN_SCORE + 1) {
-                int min = val + 2 * MIN_SCORE - MAX_SCORE - 2;
+                const int min = val + 2 * MIN_SCORE - MAX_SCORE - 2;
                 alpha = std::max(alpha, min);
                 if (alpha >= beta) return alpha;
             } else {
@@ -142,17 +139,17 @@ private:
             node_count += next.node_count;
 
             if (score >= beta) {
-                transposition_table.set(key, (score + MAX_SCORE - 2 * MIN_SCORE + 2));
+                table.set(key, (score + MAX_SCORE - 2 * MIN_SCORE + 2));
                 return score;
             }
             alpha = std::max(alpha, score);
         }
 
-        transposition_table.set(key, (alpha - MIN_SCORE + 1));
+        table.set(key, (alpha - MIN_SCORE + 1));
         return alpha;
     }
 
-    std::pair<int, int> top_level_search(int alpha, int beta) {
+    std::pair<int, int> top_level_search(int alpha, const int beta) {
         ++node_count;
 
         for (int col = 0; col < WIDTH; ++col) {
@@ -173,10 +170,10 @@ private:
         if (board.getMoves() == WIDTH * HEIGHT) return {0, WIDTH};
 
         MoveSorter sorter;
-        auto order = move_order();
+        constexpr auto order = move_order();
         for (int i = WIDTH - 1; i >= 0; --i) {
-            int col = order[i];
-            uint64_t candidate = non_losing & BitBoard::column_mask(col);
+            const int col = order[i];
+            const uint64_t candidate = non_losing & BitBoard::column_mask(col);
             if (candidate && board.playable(col)) {
                 sorter.push(candidate, col, board.moveScore(candidate));
             }

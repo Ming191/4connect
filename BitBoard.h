@@ -39,6 +39,10 @@ public:
         return board_mask;
     }
 
+    /*
+     * (board.board_mask + (1ULL << (col * (HEIGHT + 1)))) to find the lowest empty position in column 'col'
+     * & column_mask(col) to restrict the move to the column
+     */
     static BitBoard fromMoves(const std::string& moves) {
         BitBoard board;
         for (char c : moves) {
@@ -53,42 +57,66 @@ public:
         return board;
     }
 
+    /*
+     *  returns the column index of 'move_bitmap'
+     */
     static int columnFromMove(const uint64_t move_bitmap) {
         for (int col = 0; col < WIDTH; ++col) {
             if (move_bitmap & column_mask(col)) return col;
         }
         return WIDTH;
     }
-
+    /*
+     * return the mask of the top of the column
+     */
     static ull top_mask(const int col) {
         return (1ULL << (HEIGHT-1)) << (col*WIDTH);
     }
+
+    /*
+     * return the mask of the bottom of the column
+     */
     static ull bottom_mask(const int col) {
         return 1ULL << (col*WIDTH);
     }
+
+    /*
+     * return the mask of the column
+     */
     static ull column_mask(const int col) {
         return ((1ULL << HEIGHT)-1) << (col*WIDTH);
     }
 
+    /*
+     * (top_mask(col) to check whether the top of the column is empty (0) or not (1)
+     * if top_mask(col) & board_mask == 0, then the column is playable
+     */
     bool playable(int col) const{
         return !(top_mask(col) & board_mask);
     }
 
+    /*
+     * pos is the position of the player to simulate state of the game after play(col)
+     * (board_mask + bottom_mask(col)) to find the lowest empty position in column 'col'
+     * pos =| (board_mask + bottom_mask(col)) & column_mask(col) turn on the bit at the empty position
+     */
     bool checkWinningMove(int col) const {
         uint64_t pos = player_mask;
         pos |= (board_mask + bottom_mask(col)) & column_mask(col);
 
-        uint64_t m;
-
-        m = pos & (pos >> (HEIGHT + 1));
+        // horizontal
+        uint64_t m = pos & (pos >> (HEIGHT + 1));
         if (m & (m >> (2 * (HEIGHT + 1)))) return true;
 
+        // diagonal '\'
         m = pos & (pos >> HEIGHT);
         if (m & (m >> (2 * HEIGHT))) return true;
 
+        // diagonal '/'
         m = pos & (pos >> (HEIGHT + 2));
         if (m & (m >> (2 * (HEIGHT + 2)))) return true;
 
+        // vertical
         m = pos & (pos >> 1);
         if (m & (m >> 2)) return true;
 
@@ -101,12 +129,6 @@ public:
         moves++;
     }
 
-    bool canWinNextMove(int col) const {
-        ull pos(player_mask);
-        pos |= (board_mask + bottom_mask(col)) & column_mask((col));
-        return check(pos);
-    }
-
     int moveScore(const ull candidate) const {
         return __builtin_popcountll(winningPositions(player_mask | candidate));
     }
@@ -117,26 +139,50 @@ public:
     }
 
     uint64_t winningPositions(const uint64_t mask) const {
+        // vertical
+        // top-end
         uint64_t r = (mask << 1) & (mask << 2) & (mask << 3);
+
+        //horizontal
         uint64_t p = (mask << (HEIGHT + 1)) & (mask << (2 * (HEIGHT + 1)));
+        // right end
         r |= p & (mask << (3 * (HEIGHT + 1)));
+        //O O _ O
         r |= p & (mask >> (HEIGHT + 1));
         p = (mask >> (HEIGHT + 1)) & (mask >> (2 * (HEIGHT + 1)));
+
+        //left end
         r |= p & (mask >> (3 * (HEIGHT + 1)));
+        //O _ O O
         r |= p & (mask << (HEIGHT + 1));
 
+        //diagonal /
         p = (mask << HEIGHT) & (mask << (2 * HEIGHT));
+
+        //right end
         r |= p & (mask << (3 * HEIGHT));
+        //O O _ O
         r |= p & (mask >> HEIGHT);
+
         p = (mask >> HEIGHT) & (mask >> (2 * HEIGHT));
+        //left end
         r |= p & (mask >> (3 * HEIGHT));
+
+        //O _ O O
         r |= p & (mask << HEIGHT);
 
+        // diagonal '\'
         p = (mask << (HEIGHT + 2)) & (mask << (2 * (HEIGHT + 2)));
+
+        //right-end
         r |= p & (mask << (3 * (HEIGHT + 2)));
+        //O O _ O
         r |= p & (mask >> (HEIGHT + 2));
         p = (mask >> (HEIGHT + 2)) & (mask >> (2 * (HEIGHT + 2)));
+
+        //left-end
         r |= p & (mask >> (3 * (HEIGHT + 2)));
+        //O _ O O
         r |= p & (mask << (HEIGHT + 2));
 
         return r & (staticFullBoardMask() ^ board_mask);
@@ -153,23 +199,14 @@ public:
 
     uint64_t nonLosingMoves() const {
         uint64_t moves = possibleMoves();
-        uint64_t opp_wins = opponentWinningPositions();
-        uint64_t forced = moves & opp_wins;
+        const uint64_t opp_wins = opponentWinningPositions();
+        const uint64_t forced = moves & opp_wins;
         if (forced != 0) {
             if ((forced & (forced - 1)) != 0) return 0;
             moves = forced;
         }
         return moves & ~(opp_wins >> 1);
 
-    }
-
-    unsigned int play(const std::string &seq) {
-        for(unsigned int i = 0; i < seq.size(); i++) {
-            int col = seq[i] - '1';
-            if(col < 0 || col >= WIDTH || !playable(col) || canWinNextMove(col)) return i;
-            play(col);
-        }
-        return seq.size();
     }
 
     ull getHash() const {
@@ -180,14 +217,6 @@ private:
     ull player_mask;
     ull board_mask;
     unsigned int moves;
-
-    static bool check(const ull pos) {
-        if(const ull tmp = pos & (pos >> WIDTH); tmp & (tmp >> (2*WIDTH))) return true;
-        if(const ull tmp = pos & (pos >> 1); tmp & (tmp >> 2)) return true;
-        if(const ull tmp = pos & (pos >> 8); tmp & (tmp >> 16)) return true;
-        if(const ull tmp = pos & (pos >> 6); tmp & (tmp >> 12)) return true;
-        return false;
-    }
 
     static uint64_t staticBottomMask() {
         uint64_t mask = 0;
@@ -205,9 +234,9 @@ private:
         uint32_t code = 0;
         for (int i = 0; i < WIDTH; ++i) {
             int col = mirror ? (WIDTH - 1 - i) : i;
-            uint64_t col_mask = column_mask(col);
+            const uint64_t col_mask = column_mask(col);
             for (int row = 0; row <= HEIGHT; ++row) {
-                uint64_t tile_mask = col_mask & (staticBottomMask() << row);
+                const uint64_t tile_mask = col_mask & (staticBottomMask() << row);
                 if ((board_mask & tile_mask) == 0) {
                     code <<= 1;
                     break;

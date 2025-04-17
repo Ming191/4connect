@@ -5,7 +5,6 @@
 #ifndef LOOKUP_TABLE_H
 #define LOOKUP_TABLE_H
 #include <cstdint>
-#include <cstring>
 #include <memory>
 #include <vector>
 
@@ -22,19 +21,19 @@ class Storage {
 public:
     Storage() : entries(TABLE_MAX_SIZE) {}
 
-    void set(uint64_t key, uint8_t value) {
+    void set(const uint64_t key, const uint8_t value) {
         Entry entry;
         entry.key = static_cast<uint32_t>(key);
         entry.value = value;
 
-        size_t index = static_cast<size_t>(key) % entries.size();
+        const size_t index = static_cast<size_t>(key) % entries.size();
         entries[index] = entry;
     }
 
-    uint8_t get(uint64_t key) const {
-        size_t index = static_cast<size_t>(key) % entries.size();
-        const Entry& entry = entries[index];
-        return (entry.key == static_cast<uint32_t>(key)) ? entry.value : 0;
+    uint8_t get(const uint64_t key) const {
+        const size_t index = static_cast<size_t>(key) % entries.size();
+        const auto&[key, value] = entries[index];
+        return (key == static_cast<uint32_t>(key)) ? value : 0;
     }
 
 private:
@@ -45,11 +44,11 @@ class LookupTable {
 public:
     LookupTable() : storage(std::make_shared<Storage>()) {}
 
-    void set(uint64_t key, uint8_t value) {
+    void set(const uint64_t key, const uint8_t value) const {
         storage->set(key, value);
     }
 
-    uint8_t get(uint64_t key) const {
+    uint8_t get(const uint64_t key) const {
         return storage->get(key);
     }
 
