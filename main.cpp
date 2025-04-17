@@ -1,69 +1,48 @@
-#include "bitboard.h"
-#include "solver.h"
 #include <iostream>
 #include <string>
-#include <chrono>
-#include <fstream>
+#include "book.h"
+#include "lookup_table.h"
+#include "solver.h"
+
+std::pair<int, int> runSolver(const std::string& boardSequence, int& moves_to_win) {
+    const BitBoard board = BitBoard::fromMoves(boardSequence);
+    const LookupTable transposition_table;
+
+    std::optional<OpeningDatabase> opening_database;
+    try {
+        opening_database = OpeningDatabase::load();
+    } catch (const std::exception& e) {
+        std::cerr << "Opening database not loaded: " << e.what() << std::endl;
+    }
+
+    Solver solver(board, transposition_table);
+    if (opening_database) {
+        solver.with_opening_database(*opening_database);
+    }
+
+    moves_to_win = solver.score_to_win_distance(solver.solve().first);
+
+    return solver.solve();
+}
 
 int main() {
-    Bitboard board;
-    Solver solver;
-    std::string line;
-
-    std::ifstream file("test.txt");
-    std::ofstream report("reports/report_version_1_0_1.txt");
-
-    if (!file) {
-        std::cerr << "Error: Unable to open 'test.txt'.\n";
+    std::string boardSequence;
+    if (!std::getline(std::cin, boardSequence)) {
+        std::cerr << "Error reading input" << std::endl;
         return 1;
     }
+    int move_to_win = -99;
+    auto [score, bestMove] = runSolver(boardSequence, move_to_win);
 
-    if (!report) {
-        std::cerr << "Error: Unable to create 'report.txt'.\n";
-        return 1;
+    if (move_to_win > 0) {
+        std::cerr << "Position is a win in " << move_to_win << " moves" << std::endl;
+    } else if (move_to_win < 0) {
+        std::cerr << "Position is a loss in " << -move_to_win << " moves" << std::endl;
+    } else {
+        std::cerr << "Position is a draw" << std::endl;
     }
 
-    int lineCount = 0;
+    std::cout << "Best move: " << bestMove << std::endl;
 
-    while (std::getline(file, line)) {
-        lineCount++;
-        std::cout << "Processing Line " << lineCount << ": " << line << "\n";
-        report << "Processing Line " << lineCount << ": " << line << "\n";
-
-        Bitboard board; // Reset board for each game sequence
-        if (board.play(line) != line.size()) {
-            std::cout << "Invalid move sequence on Line " << lineCount << "\n";
-            report << "Invalid move sequence on Line " << lineCount << "\n";
-            continue;
-        }
-
-        // Redirect board state to report
-        std::ostringstream boardStream;
-        std::streambuf* oldCoutBuffer = std::cout.rdbuf(boardStream.rdbuf());
-        board.show();
-        std::cout.rdbuf(oldCoutBuffer);  // Restore original std::cout buffer
-
-        std::cout << boardStream.str();  // Print to console
-        report << boardStream.str();     // Write board state to file
-
-        // Start timer
-        auto start = std::chrono::high_resolution_clock::now();
-
-        int score = solver.solve(board);
-
-        // End timer and calculate duration
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
-        std::cout << "Score: " << score << "\n";
-        std::cout << "Nodes visited: " << solver.getNodeVisited() << "\n";
-        std::cout << "Time taken: " << duration.count() << " ms\n\n";
-
-        report << "Score: " << score << "\n";
-        report << "Nodes visited: " << solver.getNodeVisited() << "\n";
-        report << "Time taken: " << duration.count() << " ms\n\n";
-    }
-
-    std::cout << "Report saved to 'report.txt'\n";
-    report.close();
+    return 0;
 }

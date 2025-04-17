@@ -1,1 +1,1 @@
-main.o: main.cpp bitboard.h solver.h lookup_table.h
+main.o: main.cpp book.h lookup_table.h solver.h BitBoard.h
