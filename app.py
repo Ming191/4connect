@@ -28,6 +28,9 @@ SOLVER_PATH = "./connect4"
 def convert_board_to_sequence(board, current_player):
     return board_to_moves.board_to_moves(board)
 
+@app.get("/api/test")
+async def test_endpoint():
+    return {"message": "Test endpoint is working"}
 
 @app.post("/api/connect4-move")
 async def make_move(game_state: GameState) -> AIResponse:
