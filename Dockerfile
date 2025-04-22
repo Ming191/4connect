@@ -2,29 +2,27 @@ FROM python:3.12
 
 WORKDIR /app
 
-# Install basic dependencies, including build tools and C++ compiler
 RUN apt-get update && apt-get install -y \
     build-essential \
     g++ \
-    cmake \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Configure environment
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh \
+    && chmod +x cmake-3.28.3-linux-x86_64.sh \
+    && ./cmake-3.28.3-linux-x86_64.sh --skip-license --prefix=/usr/local \
+    && rm cmake-3.28.3-linux-x86_64.sh
+
 ENV PYTHONUNBUFFERED=1
 
-# Copy Python dependencies and install them
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy source code
 COPY . .
 
-# Build the Connect4 solver
 RUN mkdir -p build && cd build && cmake .. && make && cd .. && cp build/connect4 .
 
-# Expose the port (provided by Render or other platforms)
 EXPOSE $PORT
 
-# Start the Python application
 CMD ["python", "app.py"]
