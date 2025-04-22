@@ -32,7 +32,7 @@ public:
 
     uint8_t get(const uint64_t key) const {
         const size_t index = static_cast<size_t>(key) % entries.size();
-        const auto&[key, value] = entries[index];
+        const auto&[entry_key, value] = entries[index];
         return (key == static_cast<uint32_t>(key)) ? value : 0;
     }
 

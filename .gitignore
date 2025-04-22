@@ -1,2 +1,7 @@
 venv
 build
+c4solver
+connect4
+main.o
+__pycache__/
+Makefile
